@@ -31,10 +31,13 @@ In this post, you learn how to bulk process a series of full and incremental exp
 
 In case you’re not familiar with these technologies:
 
-1. Amazon EMR Serverless makes it simple to run applications using open-source analytics frameworks like Apache Spark and Apache Hive without configuring, managing, or scaling clusters.
-2. Apache Spark is an interface for programming clusters with implicit data parallelism and fault tolerance.
-3. Apache Iceberg is a table format geared for large-scale datasets stored in S3 that has features like rapid query performance, atomic commits, and concurrent writing abilities. It also supports time-travel to query the data at points in the past. You can learn more on how Iceberg works.
-4. Amazon Athena is a serverless, interactive analytics service built on open-source frameworks, supporting open-table and file formats
+- Amazon EMR Serverless makes it simple to run applications using open-source analytics frameworks like Apache Spark and Apache Hive without configuring, managing, or scaling clusters.
+  
+- Apache Spark is an interface for programming clusters with implicit data parallelism and fault tolerance.
+
+- Apache Iceberg is a table format geared for large-scale datasets stored in S3 that has features like rapid query performance, atomic commits, and concurrent writing abilities. It also supports time-travel to query the data at points in the past. You can learn more on how Iceberg works.
+
+- Amazon Athena is a serverless, interactive analytics service built on open-source frameworks, supporting open-table and file formats
 
 The typical way to setup your analytics using DynamoDB exports is to first initiate a one-time full export to generate a new Iceberg table, and then repeatedly perform incremental exports (each incremental time period can be as small as 15 minutes or as large as 24 hours) to update the Iceberg table with all the changes. The data processing is done using Spark jobs running at scale on EMR serverless.
 
@@ -42,10 +45,12 @@ Note: You can optionally automate the pipeline and schedule regular updates usin
 
 The following diagram shows the pipeline:
 
-![Architecture diagram](./img/architecture.png)
+![Architecture diagram](./img/Architecture.png)
 
 1. Application traffic updates DynamoDB. The new incremental export to S3 writes the changes in a raw format.
+   
 2. The EMR Serverless script integrates the changes into the Iceberg table as a processed layer.
+
 3. Then downstream applications such as Athena can query the table as a single unit, enabling analysts or other consumers to analyze fresh DynamoDB data.
 
 ### Cost ( required )
@@ -90,20 +95,15 @@ The following table provides a sample cost breakdown for deploying this Guidance
 *List any installable third-party tools required for deployment.*
 
 
-### AWS account requirements (If applicable)
+### AWS account requirements
 
-*List out pre-requisites required on the AWS account if applicable, this includes enabling AWS regions, requiring ACM certificate.*
+This Guidance requires that you have access to the following AWS services:
 
-**Example:** “This deployment requires you have public ACM certificate available in your AWS account”
-
-**Example resources:**
-- ACM certificate 
-- DNS record
-- S3 bucket
-- VPC
-- IAM role with specific permissions
-- Enabling a Region or service etc.
-
+- Amazon DynamoDB
+- Amazon S3
+- Amazon EMR Serverless
+- Amazon Athena
+- AWS Glue
 
 ### aws cdk bootstrap (if sample code has aws-cdk)
 
