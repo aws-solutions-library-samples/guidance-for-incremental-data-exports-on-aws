@@ -1,17 +1,13 @@
 # Guidance for Incremental Data Exports on AWS
 
-## Table of Content (required)
-
-List the top-level sections of the README template, along with a hyperlink to the specific section.
-
-### Required
+## Table of Content
 
 1. [Overview](#overview)
     - [Cost](#cost)
 2. [Prerequisites](#prerequisites)
     - [Operating System](#operating-system)
-3. [Deployment Steps](#deployment-steps-required)
-4. [Deployment Validation](#deployment-validation-required)
+3. [Deployment Steps](#deployment-steps)
+4. [Deployment Validation](#deployment-validation)
 5. [Running the Guidance](#running-the-guidance)
 6. [Next Steps](#next-steps-required)
 7. [Cleanup](#cleanup-required)
@@ -86,7 +82,7 @@ This Guidance requires that you have access to the following AWS services:
 - Amazon Athena
 - AWS Glue
 
-## Deployment Steps (required)
+## Deployment Steps
 
 Deployment steps must be numbered, comprehensive, and usable to customers at any level of AWS expertise. The steps must include the precise commands to run, and describe the action it performs.
 
@@ -107,8 +103,7 @@ Deployment steps must be numbered, comprehensive, and usable to customers at any
 6. Capture the domain name created by running this CLI command ```aws apigateway ............```
 
 
-
-## Deployment Validation  (required)
+## Deployment Validation
 
 <Provide steps to validate a successful deployment, such as terminal output, verifying that the resource is created, status of the CloudFormation template, etc.>
 
