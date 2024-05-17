@@ -137,7 +137,7 @@ Pick a nice round number time value from the recent past for simplicity. This wi
 
 ![Solutions Screen-1](./img/solutions-screen-1.jpeg)
 
-For more details on how to do a full export, see AWS documentation on [DynamoDB exports[(https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/S3DataExport.HowItWorks.html).
+For more details on how to do a full export, see AWS documentation on [DynamoDB exports](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/S3DataExport.HowItWorks.html).
 
 Once the full export completes, you will see the output in your S3 bucket.
 
