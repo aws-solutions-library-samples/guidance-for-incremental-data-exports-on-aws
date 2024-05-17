@@ -9,14 +9,14 @@
 3. [Deployment Steps](#deployment-steps)
 4. [Deployment Validation](#deployment-validation)
 5. [Running the Guidance](#running-the-guidance)
-6. [Next Steps](#next-steps-required)
-7. [Cleanup](#cleanup-required)
+6. [Next Steps](#next-steps)
+7. [Cleanup](#cleanup)
 
 ## Overview
 
 [DynamoDB](https://aws.amazon.com/dynamodb/) recently launched a new feature: [Incremental export to Amazon Simple Storage Service (Amazon S3)](https://aws.amazon.com/blogs/database/introducing-incremental-export-from-amazon-dynamodb-to-amazon-s3/). You can use incremental exports to update your downstream systems regularly using only the changed data. You no longer need to do a full export each time you need fresh data. The incremental export feature outputs only the data items that have been inserted, updated, or deleted between two specified points in time. The file format for incremental exports is different from full exports because it acts as an overlay (like a patch in source code) and includes metadata such as the time of each item’s last update as well as the old and new images of the item. Tooling that can read the full export format will not natively be able to read the combination of a full export plus the series of incremental exports without effectively applying the overlay first.
 
-In this post, you learn how to bulk process a series of full and incremental exports using Amazon EMR Serverless with Apache Spark to produce a single Apache Iceberg table representing the latest state of the DynamoDB table, which you will then be able to query using Amazon Athena. Note that everything, from exporting to bulk processing to querying, is serverless.
+In this post, you learn how to bulk process a series of full and incremental exports using [Amazon EMR Serverless]([https://aws.amazon.com/blogs/database/use-amazon-dynamodb-incremental-export-to-update-apache-iceberg-tables/#:~:text=incremental%20exports%20using-,Amazon%20EMR%20Serverless,-with%20Apache%20Spark](https://aws.amazon.com/emr/)) with [Apache Spark](https://spark.apache.org/) to produce a single [Apache Iceberg](https://iceberg.apache.org/) table representing the latest state of the DynamoDB table, which you will then be able to query using [Amazon Athena](https://aws.amazon.com/athena/?whats-new-cards.sort-by=item.additionalFields.postDateTime&whats-new-cards.sort-order=desc). Note that everything, from exporting to bulk processing to querying, is serverless.
 
 In case you’re not familiar with these technologies:
 
@@ -24,13 +24,11 @@ In case you’re not familiar with these technologies:
   
 - Apache Spark is an interface for programming clusters with implicit data parallelism and fault tolerance.
 
-- Apache Iceberg is a table format geared for large-scale datasets stored in S3 that has features like rapid query performance, atomic commits, and concurrent writing abilities. It also supports time-travel to query the data at points in the past. You can learn more on how Iceberg works.
+- Apache Iceberg is a table format geared for large-scale datasets stored in S3 that has features like rapid query performance, atomic commits, and concurrent writing abilities. It also supports time-travel to query the data at points in the past. You can learn more on [how Iceberg works](https://docs.aws.amazon.com/emr/latest/ReleaseGuide/emr-iceberg-how-it-works.html).
 
 - Amazon Athena is a serverless, interactive analytics service built on open-source frameworks, supporting open-table and file formats
 
 The typical way to setup your analytics using DynamoDB exports is to first initiate a one-time full export to generate a new Iceberg table, and then repeatedly perform incremental exports (each incremental time period can be as small as 15 minutes or as large as 24 hours) to update the Iceberg table with all the changes. The data processing is done using Spark jobs running at scale on EMR serverless.
-
-Note: You can optionally automate the pipeline and schedule regular updates using AWS EventBridge or Amazon Managed Workflows for Apache Airflow.
 
 The following diagram shows the pipeline:
 
@@ -118,7 +116,7 @@ Deployment steps must be numbered, comprehensive, and usable to customers at any
 
 ## Running the Guidance
 
-We will assume that you already have a DynamoDB table that you want to export for analytics. Exporting from a table doesn’t change the table or interfere with other traffic to the table. If you want to create a small sample table just for experimental purposes, you can refer to the getting started guide to setup your table.
+We will assume that you already have a DynamoDB table that you want to export for analytics. Exporting from a table doesn’t change the table or interfere with other traffic to the table. If you want to create a small sample table just for experimental purposes, you can refer to the [getting started guide](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/GettingStartedDynamoDB.html) to setup your table.
 
 These instructions use three S3 bucket locations.
 
@@ -126,19 +124,20 @@ These instructions use three S3 bucket locations.
 2. An S3 folder for the Spark scripts (“spark-script-bucket”)
 3. An S3 folder for the Iceberg table (“iceberg-bucket”) as well as a generated schema definition file
 
-You can use the same S3 bucket for all these with different prefixes, or you can use different buckets. We recommend you follow S3 security best practices when you setup S3 buckets.
+You can use the same S3 bucket for all these with different prefixes, or you can use different buckets. We recommend you follow [S3 security best practices](https://docs.aws.amazon.com/AmazonS3/latest/userguide/security-best-practices.html) when you setup S3 buckets.
 
 **Step 1: Perform a full export from your DynamoDB table**
 
 You’ll get things started with a full export of your DynamoDB table. This step is only done once.
 
-To do a full export, navigate to the Exports to S3 section in your DynamoDB console and choose Export to S3.
-Specify a DynamoDB table, an S3 bucket **(<dynamodb-export-bucket>)**, and an optional prefix. Select Full export and select Export from an earlier point in time.
-Pick a nice round number time value from the recent past for simplicity. This will then be the starting time of your first incremental export. If you’re doing hourly exports, pick a recent top of the hour. In this example we will use **2023-10-01 12:00:00** in the local time zone. Select DynamoDB JSON as your output type, pick the encryption key, and choose Export.
+1. To do a full export, navigate to the **Exports to S3** section in your DynamoDB console and choose Export to S3.
+
+2. Specify a DynamoDB table, an S3 bucket ```(<dynamodb-export-bucket>)```, and an optional prefix. Select **Full export** and select **Export from an earlier point in time**.
+Pick a nice round number time value from the recent past for simplicity. This will then be the starting time of your first incremental export. If you’re doing hourly exports, pick a recent top of the hour. In this example we will use ```2023-10-01 12:00:00``` in the local time zone. Select **DynamoDB JSON** as your output type, pick the encryption key, and choose **Export**.
 
 ![Solutions Screen-1](./img/solutions-screen-1.jpeg)
 
-For more details on how to do a full export, see AWS documentation on DynamoDB exports.
+For more details on how to do a full export, see AWS documentation on [DynamoDB exports[(https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/S3DataExport.HowItWorks.html).
 
 Once the full export completes, you will see the output in your S3 bucket.
 
@@ -146,13 +145,13 @@ Once the full export completes, you will see the output in your S3 bucket.
 
 Next, configure an EMR Serverless application that will act as the execution environment for all your bulk activities. EMR Serverless is ideal for these jobs because it runs for a short duration and then has a long delay before the next invocation. EMR Serverless automatically determines the resources that the application needs, allocates these resources to process your jobs, and releases the resources when the jobs finish. Hence, you do not incur any additional costs when your jobs are not running.
 
-From your AWS Console, make sure you’re in the same AWS Region as where your three buckets are located. Then search for Amazon EMR to open the EMR console. On the left sidebar choose EMR Serverless.
+From your AWS Console, make sure you’re in the same AWS Region as where your three buckets are located. Then search for **Amazon EMR** to open the EMR console. On the left sidebar choose **EMR Serverless**.
 
 ![Solutions Screen-2](./img/solutions-screen-2.png)
 
-1. Select Get started (or if this isn’t your first time using EMR Studio, select Manage applications).
+1. Select **Get started** (or if this isn’t your first time using EMR Studio, select **Manage applications**).
 
-2. Now you can create an EMR Serverless application. Choose type Spark and the latest version of EMR from drop down as shown:
+2. Now you can create an EMR Serverless application. Choose type **Spark** and the latest version of EMR from drop down as shown:
 
 ![Solutions Screen-3](./img/solutions-screen-3.png)
 
@@ -372,10 +371,10 @@ Some Iceberg features to be aware of:
 
 2. [Time travel](https://docs.aws.amazon.com/athena/latest/ug/querying-iceberg-table-data.html) – the ability to query at a past time regardless of the current state of the data
 
-## Next Steps (required)
+## Next Steps
 
 Provide suggestions and recommendations about how customers can modify the parameters and the components of the Guidance to further enhance it according to their requirements.
 
-## Cleanup (required)
+## Cleanup
 
 If you created any demo [DynamoDB](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/WorkingWithTables.Basics.html#WorkingWithTables.Basics.DeleteTable) tables, you can [delete those tables](https://docs.aws.amazon.com/emr/latest/EMR-Serverless-UserGuide/studio.html#studio-manage-app) to clean up. It’s good form to stop and delete your EMR Serverless application as part of the clean-up, but you would only be charged if you are running jobs under the application. Lastly, you may wish to [delete any S3 objects](https://docs.aws.amazon.com/AmazonS3/latest/userguide/DeletingObjects.html) to avoid unwanted charges to your AWS account.
