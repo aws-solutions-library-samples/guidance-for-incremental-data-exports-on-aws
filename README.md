@@ -34,11 +34,23 @@ The following diagram shows the pipeline:
 
 ![Architecture diagram](./img/Architecture.png)
 
-1. Application traffic updates DynamoDB. The new incremental export to S3 writes the changes in a raw format.
-   
-2. The EMR Serverless script integrates the changes into the Iceberg table as a processed layer.
+1. Application traffic consistently adding, updating, and deleting items in an Amazon DynamoDB table. 
 
-3. Then downstream applications such as Athena can query the table as a single unit, enabling analysts or other consumers to analyze fresh DynamoDB data.
+2. Perform full export of your Amazon DynamoDB table. This will writes the exported data into Amazon S3 in JSON format.
+
+3. Create prepare and use Amazon EMR Serverless. This will read the full export of Amazon DynamoDB table from Amazon S3 and will dynamically identify Iceberg table schema with the full set of columns that will map to all the unique attributes from your full DynamoDB exported dataset
+
+4. Create AWS Glue Data Catalog to persist the Iceberg table meta store to query the table from Athena (or any Hive Meta store compatible query engine) using the same Glue Catalog
+
+5. Use Amazon EMR Serverless to build the Iceberg table based on the full export of Amazon DynamoDB table and using the Iceberg table generated schema
+
+6. Analyst uses Amazon Athena query to verify that the Iceberg table is accessible and readable. This involves executing SELECT query on the Iceberg table through Athena to ensure that data can be retrieved successfully and accurately.
+
+7. Perform an incremental export of your Amazon DynamoDB table in JSON format. This will only export the changed data from Amazon DynamoDB table since the last full or incremental export
+
+8. Use Amazon EMR Serverless to update previously created Iceberg table with the incremental export of Amazon DynamoDB table data
+
+9. Analyst will use same Amazon Athena query to verify that the Iceberg table shows changed records. For example, if you’ve added or deleted items in DynamoDB table after full export, the count should reflect this
 
 ### Cost
 
