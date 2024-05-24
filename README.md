@@ -51,12 +51,9 @@ As of 04/15/2024, the cost for running this guidance with the default settings i
 | ----------- | ------------ | ------------ |
 | Amazon DynamoDB | Average item size 0.5kb, 1 WCU per message  | $ 18.05 month |
 | AWS S3 | 1 Million requests per month, Execution time of 20 milliseconds, 128 MB of memory allocated, Concurrency of 100  | $ 30.22 month |
-| Total |  | $ 48.27 |
-Amazon EMR Serverless | 1 Million requests per month, Execution time of 20 milliseconds, 128 MB of memory allocated, Concurrency of 100  | $ 30.22 month |
-| Total |  | $ 48.27 |
-Amazon Athena | 1 Million requests per month, Execution time of 20 milliseconds, 128 MB of memory allocated, Concurrency of 100  | $ 30.22 month |
-| Total |  | $ 48.27 |
-AWS Glue | 1 Million requests per month, Execution time of 20 milliseconds, 128 MB of memory allocated, Concurrency of 100  | $ 30.22 month |
+| Amazon EMR Serverless | 1 Million requests per month, Execution time of 20 milliseconds, 128 MB of memory allocated, Concurrency of 100  | $ 30.22 month |
+| Amazon Athena | 1 Million requests per month, Execution time of 20 milliseconds, 128 MB of memory allocated, Concurrency of 100  | $ 30.22 month |
+| AWS Glue | 1 Million requests per month, Execution time of 20 milliseconds, 128 MB of memory allocated, Concurrency of 100  | $ 30.22 month |
 | Total |  | $ 48.27 |
 
 We recommend creating a [Budget](https://docs.aws.amazon.com/cost-management/latest/userguide/budgets-managing-costs.html) through [AWS Cost Explorer](https://aws.amazon.com/aws-cost-management/aws-cost-explorer/) to help manage costs. Prices are subject to change. For full details, refer to the pricing webpage for each AWS service used in this Guidance.
@@ -309,7 +306,7 @@ To run an incremental export, use the AWS console for DynamoDB and navigate to t
 
 While waiting for the incremental export job to complete, you can copy the script [update_iceberg_from_incremental_export.py](https://github.com/aws-solutions-library-samples/guidance-for-incremental-data-exports-on-aws/blob/main/code/update_iceberg_from_incremental_export.py) and save it in ```<spark-script-bucket>```.
 
-The script works similarly to the script for full exports, except in the final step it will [MERGE[(https://iceberg.apache.org/docs/latest/spark-writes/#merge-into) the incremental export’s DataFrame into the existing Iceberg table. To merge this incremental data into the target Iceberg table, the script dynamically creates join conditions based on the item keys. These conditions will determine how the incremental data matches with existing records in the target table. The MERGE INTO command allows for the combination of the target and source tables based on the join conditions.
+The script works similarly to the script for full exports, except in the final step it will [MERGE](https://iceberg.apache.org/docs/latest/spark-writes/#merge-into) the incremental export’s DataFrame into the existing Iceberg table. To merge this incremental data into the target Iceberg table, the script dynamically creates join conditions based on the item keys. These conditions will determine how the incremental data matches with existing records in the target table. The MERGE INTO command allows for the combination of the target and source tables based on the join conditions.
 
 The merge logic is as follows:
 
@@ -321,7 +318,7 @@ The merge logic is as follows:
 
 4. The constructed merge query is then executed using SparkSQL, resulting in the target table being updated with the latest incremental changes.
 
-To submit the incremental update job, go to the EMR console and choose Submit job to your EMR Serverless application. This step is similar to step 5. Just note the different script name and the need to point at the incremental export folder this time.
+To submit the incremental update job, go to the EMR console and choose **Submit job** to your EMR Serverless application. This step is similar to step 5. Just note the different script name and the need to point at the incremental export folder this time.
 This section should include:
 
 ![Solutions Screen-9](./img/solutions-screen-9.png)
@@ -373,8 +370,12 @@ Some Iceberg features to be aware of:
 
 ## Next Steps
 
-Provide suggestions and recommendations about how customers can modify the parameters and the components of the Guidance to further enhance it according to their requirements.
+In this post, you learned how to build on Amazon DynamoDB’s incremental export to S3 feature to keep an Apache Iceberg table continuously updated using Amazon EMR Serverless. The Iceberg format supports high performance access from multiple downstream tools. If your use case aligns with the example provided in the guidance, We encourage you to give it a try with your Amazon DynamoDB table.
 
 ## Cleanup
 
 If you created any demo [DynamoDB](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/WorkingWithTables.Basics.html#WorkingWithTables.Basics.DeleteTable) tables, you can [delete those tables](https://docs.aws.amazon.com/emr/latest/EMR-Serverless-UserGuide/studio.html#studio-manage-app) to clean up. It’s good form to stop and delete your EMR Serverless application as part of the clean-up, but you would only be charged if you are running jobs under the application. Lastly, you may wish to [delete any S3 objects](https://docs.aws.amazon.com/AmazonS3/latest/userguide/DeletingObjects.html) to avoid unwanted charges to your AWS account.
+
+## Notices
+
+*Customers are responsible for making their own independent assessment of the information in this Guidance. This Guidance: (a) is for informational purposes only, (b) represents AWS current product offerings and practices, which are subject to change without notice, and (c) does not create any commitments or assurances from AWS and its affiliates, suppliers or licensors. AWS products or services are provided “as is” without warranties, representations, or conditions of any kind, whether express or implied. AWS responsibilities and liabilities to its customers are controlled by AWS agreements, and this Guidance is not part of, nor does it modify, any agreement between AWS and its customers.*
