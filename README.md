@@ -38,7 +38,7 @@ The following diagram shows the pipeline:
 
 2. Perform full export of your Amazon DynamoDB table. This will writes the exported data into Amazon S3 in JSON format.
 
-3. Create prepare and use Amazon EMR Serverless. This will read the full export of Amazon DynamoDB table from Amazon S3 and will dynamically identify Iceberg table schema with the full set of columns that will map to all the unique attributes from your full DynamoDB exported dataset
+3. Create, prepare and use Amazon EMR Serverless. This will read the full export of Amazon DynamoDB table from Amazon S3 and will dynamically identify Iceberg table schema with the full set of columns that will map to all the unique attributes from your full DynamoDB exported dataset
 
 4. Create AWS Glue Data Catalog to persist the Iceberg table meta store to query the table from Athena (or any Hive Meta store compatible query engine) using the same Glue Catalog
 
