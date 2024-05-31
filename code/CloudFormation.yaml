@@ -1,0 +1,21 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: This template creates the required DynamoDB resources (XX) that is going to be used in the guidance.
+
+Resources:
+  ProductTable:
+    Type: 'AWS::DynamoDB::Table'
+    Properties:
+      TableName: product
+      AttributeDefinitions:
+        - AttributeName: 'product_id'
+          AttributeType: 'S'
+        # Add more attribute definitions as needed
+      KeySchema:
+        - AttributeName: 'product_id'
+          KeyType: 'HASH'
+      BillingMode: PAY_PER_REQUEST
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: true
+      Tags:
+        - Key: Name
+          Value: product
