@@ -355,7 +355,7 @@ aws dynamodb update-item \
     --update-expression "SET quantity = :value" \
     --expression-attribute-values '{":value": {"S": "100"}}'
 
-    aws dynamodb delete-item \
+aws dynamodb delete-item \
     --table-name product \
     --key '{"product_id": {"S": "1"}}'
 ```
