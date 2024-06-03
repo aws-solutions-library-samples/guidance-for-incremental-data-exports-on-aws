@@ -56,17 +56,17 @@ The following diagram shows the pipeline:
 
 You are responsible for the cost of the AWS services used while running this Guidance.
 
-As of 04/15/2024, the cost for running this guidance with the default settings in the US East (N. Virginia) is approximately $48.27 per month for processing 1 million items.
+As of 04/15/2024, the cost for running this guidance with the default settings in the US East (N. Virginia) is approximately $44.80 per month for processing 10 GB Full Export & 1 GB incremental export.
 
 
 | AWS service  | Dimensions | Monthly Cost [USD] |
 | ----------- | ------------ | ------------ |
-| Amazon DynamoDB | Average item size 0.5kb, 1 WCU per message  | $ 18.05 month |
-| AWS S3 | 1 Million requests per month, Execution time of 20 milliseconds, 128 MB of memory allocated, Concurrency of 100  | $ 30.22 month |
-| Amazon EMR Serverless | 1 Million requests per month, Execution time of 20 milliseconds, 128 MB of memory allocated, Concurrency of 100  | $ 30.22 month |
-| Amazon Athena | 1 Million requests per month, Execution time of 20 milliseconds, 128 MB of memory allocated, Concurrency of 100  | $ 30.22 month |
-| AWS Glue | 1 Million requests per month, Execution time of 20 milliseconds, 128 MB of memory allocated, Concurrency of 100  | $ 30.22 month |
-| Total |  | $ 48.27 |
+| Amazon DynamoDB | Table class (Standard), Average item size (all attributes) (.5 KB), Data storage size (10 GB) Full export to Amazon S3 (10 GB), Incremental export to Amazon S3 (1 GB) | $ 3.60 month |
+| AWS S3 | 5 GB of Amazon S3 Standard storage, 20,000 Get Requests, 2,000 Put Requests, and 100 GB of data transfer out  | $ 0.49 month |
+| Amazon EMR Serverless | 4 vCPU hours x 49.60 hours job runtime/month & 16 memory hours  | $ 15.02 month |
+| Amazon Athena | Total number of queries (2976 per month), Amount of data scanned per query (1 GB)  | $ 14.53 month |
+| AWS Glue | Number of DPUs for Apache Spark job (2), Number of DPUs for Python Shell job (0.0625) Number of Objects stored (1 million per month), Number of access requests (1 million per month)  | $ 11.15 month |
+| Total |  | $ 44.80 month|
 
 We recommend creating a [Budget](https://docs.aws.amazon.com/cost-management/latest/userguide/budgets-managing-costs.html) through [AWS Cost Explorer](https://aws.amazon.com/aws-cost-management/aws-cost-explorer/) to help manage costs. Prices are subject to change. For full details, refer to the pricing webpage for each AWS service used in this Guidance.
 
