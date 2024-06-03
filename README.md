@@ -74,6 +74,8 @@ We recommend creating a [Budget](https://docs.aws.amazon.com/cost-management/la
 
 - The [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) installed.
 - The visual editor of your choice, for example [Visual Studio Code](https://code.visualstudio.com/).
+- Install CloudFormation template to quickly deploy and test the solution. Follow the steps that are mentioned in this [link](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cfn-console-create-stack.html) to deploy the stack.
+- Permissions to deploy an DynamoDB table.
 
 ### Operating System
 
@@ -91,41 +93,74 @@ This Guidance requires that you have access to the following AWS services:
 
 ## Deployment Steps
 
-Deployment steps must be numbered, comprehensive, and usable to customers at any level of AWS expertise. The steps must include the precise commands to run, and describe the action it performs.
+These deployment instructions are optimized to best work on Mac or Amazon Linux 2023. Deployment in another OS may require additional steps.
 
-* All steps must be numbered.
-* If the step requires manual actions from the AWS console, include a screenshot if possible.
-* The steps must start with the following command to clone the repo. ```git clone xxxxxxx```
-* If applicable, provide instructions to create the Python virtual environment, and installing the packages using ```requirement.txt```.
-* If applicable, provide instructions to capture the deployed resource ARN or ID using the CLI command (recommended), or console action.
-
- 
-**Example:**
-
-1. Clone the repo using command ```git clone xxxxxxxxxx```
-2. cd to the repo folder ```cd <repo-name>```
-3. Install packages in requirements using command ```pip install requirement.txt```
-4. Edit content of **file-name** and replace **s3-bucket** with the bucket name in your account.
-5. Run this command to deploy the stack ```cdk deploy``` 
-6. Capture the domain name created by running this CLI command ```aws apigateway ............```
-
+1. Clone the repo using command ``` git clone https://github.com/aws-solutions-library-samples/guidance-for-incremental-data-exports-on-aws.git```
+2. cd to the repo folder ```cd guidance-for-incremental-data-exports-on-aws```
+3. cd to code folder to deploy the CloudFormation template ```cd code```
+4. Run the below command to deploy the stack in your account.
+```
+aws cloudformation create-stack \
+--stack-name createddbtable \
+--template-body file://CloudFormation.yaml
+```
 
 ## Deployment Validation
 
-<Provide steps to validate a successful deployment, such as terminal output, verifying that the resource is created, status of the CloudFormation template, etc.>
-
-
-**Examples:**
-
-* Open CloudFormation console and verify the status of the template with the name starting with xxxxxx.
-* If deployment is successful, you should see an active database instance with the name starting with <xxxxx> in        the RDS console.
-*  Run the following CLI command to validate the deployment: ```aws cloudformation describe xxxxxxxxxxxxx```
-
-
+Open CloudFormation console and verify the status of the template with the name of the stack specified in step 4 of the deployment steps.
 
 ## Running the Guidance
 
-We will assume that you already have a DynamoDB table that you want to export for analytics. Exporting from a table doesn’t change the table or interfere with other traffic to the table. If you want to create a small sample table just for experimental purposes, you can refer to the [getting started guide](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/GettingStartedDynamoDB.html) to setup your table.
+You can use your existing DynamoDB table for export or can use the table ``product`` created by stack in the deployment step for analytics. Exporting from a table doesn’t change the table or interfere with other traffic to the table. If you want to create a small sample table just for experimental purposes, you can refer to the [getting started guide](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/GettingStartedDynamoDB.html) to setup your table.
+
+If you planning to use the DynamoDB table created by the stack in the deployment step then lets insert some items in the table before performing full export 
+
+Run below CLI command to insert items in the DynamoDB table ``product`` created by stack
+```
+aws dynamodb put-item \
+    --table-name product \
+    --item '{
+        "product_id": {"S": "18"},
+        "quantity": {"N": "100"},
+        "remaining_count": {"N": "158"},
+        "inventory_date": {"S": "2023-11-28"},
+        "price": {"S": "0.3154686218727"},
+        "product_name": {"S": "Coffee Maker"}
+    }'
+
+aws dynamodb put-item \
+    --table-name product \
+    --item '{
+        "product_id": {"S": "13"},
+        "quantity": {"N": "10"},
+        "remaining_count": {"N": "626"},
+        "inventory_date": {"S": "2023-10-14"},
+        "price": {"S": "37644223522.8023"},
+        "product_name": {"S": "Wireless Bluetooth Headphones"}
+    }'
+
+    aws dynamodb put-item \
+    --table-name product \
+    --item '{
+        "product_id": {"S": "9"},
+        "quantity": {"N": "3"},
+        "remaining_count": {"N": "846"},
+        "inventory_date": {"S": "2023-12-06"},
+        "price": {"S": "97496296422.6562"},
+        "product_name": {"S": "Fitness Tracker"}
+    }'
+
+    aws dynamodb put-item \
+    --table-name product \
+    --item '{
+        "product_id": {"S": "1"},
+        "quantity": {"N": "12"},
+        "remaining_count": {"N": "773"},
+        "inventory_date": {"S": "2023-10-25"},
+        "price": {"S": "8.21824213901464"},
+        "product_name": {"S": "Fitness Tracker"}
+    }'
+```
 
 These instructions use three S3 bucket locations.
 
@@ -309,6 +344,21 @@ The following screenshot shows a simple select with the first 10 items from the 
 Note that the table is automatically visible from the Athena console because the previous script created the Iceberg table using Glue Data Catalog.
 
 **Step 8: Perform an incremental export from your DynamoDB table**
+
+For running the guidance, If you using DynamoDB table ``product`` created by the stack then lets make some changes in the items before perforrming incremental export
+
+Run below CLI command to update quantiry for items with product_id 18 and delete item with product_id 1
+```
+aws dynamodb update-item \
+    --table-name product \
+    --key '{"product_id": {"S": "18"}}' \
+    --update-expression "SET quantity = :value" \
+    --expression-attribute-values '{":value": {"S": "100"}}'
+
+    aws dynamodb delete-item \
+    --table-name product \
+    --key '{"product_id": {"S": "1"}}'
+```
 
 To run an incremental export, use the AWS console for DynamoDB and navigate to the **Exports to S3**. Select the same table, and provide the target S3 bucket and prefix. These can be the same as your full export, but don’t have to be. Select **Incremental Export**. The start time should be the time used in Step 1. The end time can be an hour later. With exports the start time is always inclusive and the end time is always exclusive, so by using the exact same timestamp when stitching exports together it ensures no missing or duplicate data. Select **DynamoDB JSON** as your export type, choose either **New and old images or New images only** (the Spark script only requires the new images), pick your encryption key, and start the export.
 
