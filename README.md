@@ -439,9 +439,9 @@ In this post, you learned how to build on Amazon DynamoDB’s incremental export
    ```
    aws cloudformation delete-stack --stack-name createddbtable
    ```
-4. If you created any demo [DynamoDB](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/WorkingWithTables.Basics.html#WorkingWithTables.Basics.DeleteTable) tables, you can [delete those tables](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/WorkingWithTables.Basics.html#WorkingWithTables.Basics.DeleteTable/) to clean up.
-5. It’s good form to stop and delete your [EMR Serverless application](https://docs.aws.amazon.com/emr/latest/EMR-Serverless-UserGuide/studio.html#studio-manage-app) as part of the clean-up, but you would only be charged if you are running jobs under the application.
-6. Lastly, you may wish to [delete any S3 objects](https://docs.aws.amazon.com/AmazonS3/latest/userguide/DeletingObjects.html) to avoid unwanted charges to your AWS account.
+3. If you created any demo [DynamoDB](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/WorkingWithTables.Basics.html#WorkingWithTables.Basics.DeleteTable) tables, you can [delete those tables](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/WorkingWithTables.Basics.html#WorkingWithTables.Basics.DeleteTable/) to clean up.
+4. It’s good form to stop and delete your [EMR Serverless application](https://docs.aws.amazon.com/emr/latest/EMR-Serverless-UserGuide/studio.html#studio-manage-app) as part of the clean-up, but you would only be charged if you are running jobs under the application.
+5. Lastly, you may wish to [delete any S3 objects](https://docs.aws.amazon.com/AmazonS3/latest/userguide/DeletingObjects.html) to avoid unwanted charges to your AWS account.
 
 ## Notices
 
