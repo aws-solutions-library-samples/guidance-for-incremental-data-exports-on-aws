@@ -412,7 +412,7 @@ When the script completes, the Iceberg tables will have been updated with the in
 
 To run this work on a schedule, you can repeat Step 8 and Step 9. For Step 8, adjusting the export period to meet your requirements of how often you want to update your data lake. For Step 9, make sure to substitute the new incremental export folder with the new export ID. 
 
-Note: Consider [compacting your Iceberg tables periodically](https://iceberg.apache.org/docs/1.2.0/maintenance/) as well to reduce the accumulated metadata overhead and improve query speed.
+Note: Consider [compacting your Iceberg tables periodically](https://iceberg.apache.org/docs/1.5.1/maintenance/) as well to reduce the accumulated metadata overhead and improve query speed.
 
 **Step 10: Use Athena to confirm the update**
 
@@ -439,8 +439,8 @@ In this post, you learned how to build on Amazon DynamoDB’s incremental export
    ```
    aws cloudformation delete-stack --stack-name createddbtable
    ```
-4. If you created any demo [DynamoDB](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/WorkingWithTables.Basics.html#WorkingWithTables.Basics.DeleteTable) tables, you can [delete those tables](https://docs.aws.amazon.com/emr/latest/EMR-Serverless-UserGuide/studio.html#studio-manage-app) to clean up.
-5. It’s good form to stop and delete your EMR Serverless application as part of the clean-up, but you would only be charged if you are running jobs under the application.
+4. If you created any demo [DynamoDB](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/WorkingWithTables.Basics.html#WorkingWithTables.Basics.DeleteTable) tables, you can [delete those tables](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/WorkingWithTables.Basics.html#WorkingWithTables.Basics.DeleteTable/) to clean up.
+5. It’s good form to stop and delete your [EMR Serverless application](https://docs.aws.amazon.com/emr/latest/EMR-Serverless-UserGuide/studio.html#studio-manage-app) as part of the clean-up, but you would only be charged if you are running jobs under the application.
 6. Lastly, you may wish to [delete any S3 objects](https://docs.aws.amazon.com/AmazonS3/latest/userguide/DeletingObjects.html) to avoid unwanted charges to your AWS account.
 
 ## Notices
