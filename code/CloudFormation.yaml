@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: This template creates the required DynamoDB resources (XX) that is going to be used in the guidance.
+Description: This template creates the required DynamoDB resources (SO9444) that is going to be used in the guidance.
 
 Resources:
   ProductTable:
